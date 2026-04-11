@@ -1,0 +1,32 @@
+name: Daily Weather Check
+
+on:
+  schedule:
+    # 每天北京时间早上 07:30 运行 (对应 UTC 23:30)
+    - cron: '30 23 * * *'
+  workflow_dispatch: # 这个极其重要，有了它你才能手动点击运行进行测试
+
+jobs:
+  run-weather-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检查代码
+        uses: actions/checkout@v3
+
+      - name: 安装 Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: 安装依赖包
+        run: pip install requests
+
+      - name: 执行提醒脚本
+        env:
+          # 这些名字必须和你在 Settings -> Secrets 里填的一模一样
+          QWEATHER_API_KEY: ${{ secrets.QWEATHER_API_KEY }}
+          CITY_ID: ${{ secrets.CITY_ID }}
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+        run: python weather_bot.py
