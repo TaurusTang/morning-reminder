@@ -15,7 +15,7 @@ def get_weather_data():
     """获取今日天气预报和实时空气质量"""
     weather_url = f"https://devapi.qweather.com/v7/weather/3d?location={CITY_ID}&key={API_KEY}"
     air_url = f"https://devapi.qweather.com/v7/air/now?location={CITY_ID}&key={API_KEY}"
-    
+    print(weather_url)
     try:
         wea_res = requests.get(weather_url).json()
         air_res = requests.get(air_url).json()
