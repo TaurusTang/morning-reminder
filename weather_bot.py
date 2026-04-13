@@ -3,6 +3,7 @@ import requests
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
+from email.utils import formataddr
 
 # --- 配置 ---
 API_KEY = os.environ.get("QWEATHER_API_KEY")
@@ -53,19 +54,19 @@ def get_weather_data():
     return None
 
 def send_email(content):
-    """发送邮件逻辑"""
     message = MIMEText(content, 'plain', 'utf-8')
-    message['From'] = Header("天气生活助手", 'utf-8')
-    message['To'] = Header("汤同学", 'utf-8')
+    
+    # --- 修复核心：使用 formataddr 保证 RFC 兼容性 ---
+    # 第一个参数是昵称（支持中文），第二个参数是完整的邮箱地址
+    # 它会自动生成类似：=?utf-8?b?5aSp5rCU5Yqp5omL?= <xxx@qq.com> 的格式
+    nickname = "天气助手"
+    message['From'] = formataddr((Header(nickname, 'utf-8').encode(), EMAIL_SENDER))
+    
+    message['To'] = Header("汤同学", 'utf-8') # 或者也用 formataddr
     message['Subject'] = Header("📢 今日出行贴心提醒", 'utf-8')
 
     try:
-        smtp_server = "smtp.gmail.com"
-        if EMAIL_SENDER and "qq.com" in EMAIL_SENDER.lower(): 
-            smtp_server = "smtp.qq.com"
-        elif EMAIL_SENDER and "163.com" in EMAIL_SENDER.lower(): 
-            smtp_server = "smtp.163.com"
-        
+        # ... 后续 SMTP 登录代码保持不变 ...
         server = smtplib.SMTP_SSL(smtp_server, 465)
         server.login(EMAIL_SENDER, EMAIL_PASSWORD)
         server.sendmail(EMAIL_SENDER, [EMAIL_RECEIVER], message.as_string())
