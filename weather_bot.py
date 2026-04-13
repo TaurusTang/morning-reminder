@@ -24,7 +24,7 @@ def get_weather_data():
         print(f"Weather API Response Code: {wea_res.get('code')}")
         print(f"Air API Response Code: {air_res.get('code')}")
         
-        if wea_res['code'] == '200' and air_res['code'] == '200':
+        if str(wea_res.get('code')) == '200' and str(air_res.get('code')) == '200':
             today = wea_res['daily'][0]
             return {
                 "tempMax": int(today['tempMax']),
