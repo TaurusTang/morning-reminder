@@ -12,7 +12,7 @@ EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 EMAIL_RECEIVER = os.environ.get("EMAIL_RECEIVER")
 
 # 使用标准开发域名，避免 403 域名限制
-BASE_URL = "https://devapi.qweather.com/v7"
+BASE_URL =  os.environ.get("BASE_URL")
 
 def get_weather_data():
     """获取今日天气预报和生活指数（含空气相关建议）"""
