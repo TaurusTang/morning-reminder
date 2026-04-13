@@ -54,26 +54,36 @@ def get_weather_data():
     return None
 
 def send_email(content):
+    """发送邮件逻辑 - 修复未定义变量及 RFC 校验问题"""
     message = MIMEText(content, 'plain', 'utf-8')
     
-    # --- 修复核心：使用 formataddr 保证 RFC 兼容性 ---
-    # 第一个参数是昵称（支持中文），第二个参数是完整的邮箱地址
-    # 它会自动生成类似：=?utf-8?b?5aSp5rCU5Yqp5omL?= <xxx@qq.com> 的格式
+    # 1. 修复 RFC 校验：使用 formataddr 自动处理昵称编码和邮箱格式
     nickname = "天气助手"
     message['From'] = formataddr((Header(nickname, 'utf-8').encode(), EMAIL_SENDER))
-    
-    message['To'] = Header("汤同学", 'utf-8') # 或者也用 formataddr
+    message['To'] = formataddr((Header("汤同学", 'utf-8').encode(), EMAIL_RECEIVER))
     message['Subject'] = Header("📢 今日出行贴心提醒", 'utf-8')
 
+    # 2. 修复变量未定义：先给 smtp_server 一个默认值
+    # 既然你用的是自定义域名或 QQ，默认给 smtp.qq.com 比较稳妥
+    smtp_server = "smtp.qq.com" 
+    
+    sender_lower = EMAIL_SENDER.lower() if EMAIL_SENDER else ""
+    if "qq.com" in sender_lower:
+        smtp_server = "smtp.qq.com"
+    elif "163.com" in sender_lower:
+        smtp_server = "smtp.163.com"
+    elif "gmail.com" in sender_lower:
+        smtp_server = "smtp.gmail.com"
+
     try:
-        # ... 后续 SMTP 登录代码保持不变 ...
+        # 使用端口 465 (SSL)
         server = smtplib.SMTP_SSL(smtp_server, 465)
         server.login(EMAIL_SENDER, EMAIL_PASSWORD)
         server.sendmail(EMAIL_SENDER, [EMAIL_RECEIVER], message.as_string())
         server.quit()
-        print("邮件推送成功！")
+        print(f"邮件通过 {smtp_server} 推送成功！")
     except Exception as e:
-        print(f"邮件推送失败: {e}")
+        print(f"邮件推送失败，错误详情: {e}")
 
 def main():
     data = get_weather_data()
