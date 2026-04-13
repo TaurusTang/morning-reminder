@@ -13,6 +13,7 @@ EMAIL_RECEIVER = os.environ.get("EMAIL_RECEIVER")
 
 # 使用标准开发域名，避免 403 域名限制
 BASE_URL =  os.environ.get("BASE_URL")
+print(BASE_URL)
 
 def get_weather_data():
     """获取今日天气预报和生活指数（含空气相关建议）"""
@@ -20,6 +21,7 @@ def get_weather_data():
     weather_url = f"{BASE_URL}/weather/3d?location={CITY_ID}&key={API_KEY}"
     # 生活指数：1-运动, 3-穿衣, 9-感冒, 10-空气污染扩散
     indices_url = f"{BASE_URL}/indices/1d?type=1,3,9,10&location={CITY_ID}&key={API_KEY}"
+    print(weather_url)
     
     try:
         wea_res = requests.get(weather_url, timeout=10).json()
